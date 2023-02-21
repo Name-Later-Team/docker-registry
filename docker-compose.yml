@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 networks:
   local_network:
@@ -16,6 +16,8 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
       - ../api-gateway/.env.production
+    ports:
+      - 3000:3000
     networks:
       - local_network
 
@@ -38,7 +40,7 @@ services:
     container_name: socket-service
     build:
       context: ../socket-service
-      dockerfile: ../presentation-service/Dockerfile
+      dockerfile: ../socket-service/Dockerfile
     restart: unless-stopped
     environment:
       - TZ=Asia/Ho_Chi_Minh
@@ -55,7 +57,7 @@ services:
       dockerfile: ../presenti/Dockerfile
     restart: unless-stopped
     working_dir: /app
-    command: ['pm2-runtime', 'start', 'pm2.config.js']
+    command: ["pm2-runtime", "start", "pm2.config.js"]
     ports:
       - 3004:3000
     environment:
@@ -71,7 +73,7 @@ services:
     ports:
       - 8080:8000
     #volumes:
-      #- ./casdoor/conf/app.conf:/
+    #- ./casdoor/conf/app.conf:/
     networks:
       - local_network
 
@@ -117,5 +119,14 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=mongo
     volumes:
       - ./mongo/data:/data/db
+    networks:
+      - local_network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
     networks:
       - local_network
