@@ -1,0 +1,121 @@
+version: '3'
+
+networks:
+  local_network:
+    external: true
+
+services:
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    build:
+      context: ../api-gateway
+      dockerfile: ../api-gateway/Dockerfile
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ../api-gateway/.env.production
+    networks:
+      - local_network
+
+  presentation-service:
+    image: presentation-service
+    container_name: presentation-service
+    build:
+      context: ../presentation-service
+      dockerfile: ../presentation-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ../presentation-service/.env.production
+    networks:
+      - local_network
+
+  socket-service:
+    image: socket-service
+    container_name: socket-service
+    build:
+      context: ../socket-service
+      dockerfile: ../presentation-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ../socket-service/.env.production
+    networks:
+      - local_network
+
+  presenti:
+    image: presenti
+    container_name: presenti
+    build:
+      context: ../presenti
+      dockerfile: ../presenti/Dockerfile
+    restart: unless-stopped
+    working_dir: /app
+    command: ['pm2-runtime', 'start', 'pm2.config.js']
+    ports:
+      - 3004:3000
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ../presenti/.env.production
+    networks:
+      - local_network
+
+  casdoor:
+    image: casbin/casdoor-all-in-one:v1.247.0
+    container_name: casdoor
+    ports:
+      - 8080:8000
+    #volumes:
+      #- ./casdoor/conf/app.conf:/
+    networks:
+      - local_network
+
+  rabbitmq:
+    image: rabbitmq:3.10-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    ports:
+      - 5672:5672
+      - 15671:15671
+      - 15672:15672
+    volumes:
+      - ./data:/var/lib/rabbitmq/mnesia/
+    networks:
+      - local_network
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data/pgdata
+    networks:
+      - local_network
+
+  mongo:
+    image: mongo:4.4.19-rc2
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo
+    volumes:
+      - ./mongo/data:/data/db
+    networks:
+      - local_network
