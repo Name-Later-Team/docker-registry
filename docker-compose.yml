@@ -42,6 +42,8 @@ services:
       context: ../socket-service
       dockerfile: ../socket-service/Dockerfile
     restart: unless-stopped
+    ports:
+      - 3002:3000
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
@@ -94,7 +96,7 @@ services:
       - local_network
 
   postgres:
-    image: postgres:13
+    image: postgres:14
     container_name: postgres
     restart: always
     environment:
