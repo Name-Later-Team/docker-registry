@@ -6,7 +6,7 @@ networks:
 
 services:
   api-gateway:
-    image: api-gateway
+    image: group1sechcmus/api-gateway
     container_name: api-gateway
     build:
       context: ../api-gateway
@@ -22,7 +22,7 @@ services:
       - local_network
 
   presentation-service:
-    image: presentation-service
+    image: group1sechcmus/presentation-service
     container_name: presentation-service
     build:
       context: ../presentation-service
@@ -36,7 +36,7 @@ services:
       - local_network
 
   socket-service:
-    image: socket-service
+    image: group1sechcmus/socket-service
     container_name: socket-service
     build:
       context: ../socket-service
@@ -52,7 +52,7 @@ services:
       - local_network
 
   presenti:
-    image: presenti
+    image: group1sechcmus/presenti
     container_name: presenti
     build:
       context: ../presenti
@@ -128,5 +128,17 @@ services:
     restart: unless-stopped
     ports:
       - 6379:6379
+    networks:
+      - local_network
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    container_name: ngrok
+    environment:
+      - NGROK_AUTHTOKEN=2MjmQ4H9yxaKEuwfFYGmHQDPfZV_5fuS8ZSzcSF1n5B7iKAWK
+    command: http host.docker.internal:3000 # for running on docker
+    # command: http 3000 # for running on local (from source)
+    ports:
+      - 4040:4040
     networks:
       - local_network
