@@ -67,6 +67,22 @@ services:
     networks:
       - local_network
 
+  presento:
+    image: group1sechcmus/presento
+    container_name: presento
+    build:
+      context: ../presento
+      dockerfile: ../presento/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3005:3001
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ../presento/backend/.env.production
+    networks:
+      - local_network
+
   casdoor:
     image: casbin/casdoor-all-in-one:v1.247.0
     container_name: casdoor
