@@ -80,19 +80,27 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
       - ../presento/backend/.env.production
+    volumes:
+      - ./presento/logs:/usr/src/presento/src/logs
     networks:
       - local_network
 
   casdoor:
-    image: casbin/casdoor-all-in-one:v1.247.0
+    image: casbin/casdoor:v1.266.0
     container_name: casdoor
+    restart: always
+    entrypoint: /bin/sh -c './server --createDatabase=true'
     ports:
-      - 8080:8000
-    #volumes:
-    #- ./casdoor/conf/app.conf:/
+      - 8000:8000
+    depends_on:
+      - mysql
+    environment:
+      RUNNING_IN_DOCKER: "true"
+    volumes:
+      - ./casdoor/conf:/conf/
     networks:
       - local_network
-
+    
   rabbitmq:
     image: rabbitmq:3.10-alpine
     container_name: rabbitmq
@@ -121,6 +129,20 @@ services:
       - 5432:5432
     volumes:
       - ./postgres/data:/var/lib/postgresql/data/pgdata
+    networks:
+      - local_network
+
+  mysql:
+    restart: always
+    image: mysql:8.0.25
+    container_name: mysql
+    platform: linux/amd64
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - ./mysql:/var/lib/mysql
     networks:
       - local_network
 
