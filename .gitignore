@@ -3,3 +3,22 @@ presento/logs/*
 !presento/logs/.gitkeep
 mysql/*
 !mysql/.gitkeep
+
+# postgres
+postgres/data/*
+postgres/.env
+!postgres/.gitkeep
+
+# api-gateway
+api-gateway/logs/*
+!api-gateway/logs/.gitkeep
+
+# presentation-service
+presentation-service/logs/*
+!presentation-service/logs/.gitkeep
+
+# configs
+configs/*
+!configs/.gitkeep
+
+./.env

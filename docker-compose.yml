@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 networks:
   local_network:
@@ -6,7 +6,7 @@ networks:
 
 services:
   api-gateway:
-    image: group1sechcmus/api-gateway
+    image: 'group1sechcmus/api-gateway:${GATEWAY_VERSION}'
     container_name: api-gateway
     build:
       context: ../api-gateway
@@ -16,13 +16,16 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
       - ../api-gateway/.env.production
+    volumes:
+      # mounting logs folder to local computer file system
+      - ./api-gateway/logs:/app/logs
     ports:
-      - 3000:3000
+      - 9000:9000
     networks:
       - local_network
 
   presentation-service:
-    image: group1sechcmus/presentation-service
+    image: 'group1sechcmus/presentation-service:${PRESENTATION_VERSION}'
     container_name: presentation-service
     build:
       context: ../presentation-service
@@ -32,6 +35,9 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
       - ../presentation-service/.env.production
+    volumes:
+      # mounting logs folder to local computer file system
+      - ./presentation-service/logs:/app/logs
     networks:
       - local_network
 
@@ -88,19 +94,19 @@ services:
   casdoor:
     image: casbin/casdoor:v1.266.0
     container_name: casdoor
-    restart: always
+    restart: unless-stopped
     entrypoint: /bin/sh -c './server --createDatabase=true'
     ports:
       - 8000:8000
     depends_on:
       - mysql
     environment:
-      RUNNING_IN_DOCKER: "true"
+      RUNNING_IN_DOCKER: 'true'
     volumes:
       - ./casdoor/conf:/conf/
     networks:
       - local_network
-    
+
   rabbitmq:
     image: rabbitmq:3.10-alpine
     container_name: rabbitmq
@@ -120,7 +126,7 @@ services:
   postgres:
     image: postgres:14
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
@@ -128,12 +134,12 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./postgres/data:/var/lib/postgresql/data/pgdata
+      - ./postgres/data:/var/lib/postgresql/data
     networks:
       - local_network
 
   mysql:
-    restart: always
+    restart: unless-stopped
     image: mysql:8.0.25
     container_name: mysql
     platform: linux/amd64
@@ -149,7 +155,7 @@ services:
   mongo:
     image: mongo:4.4.19-rc2
     container_name: mongo
-    restart: always
+    restart: unless-stopped
     ports:
       - 27017:27017
     environment:
