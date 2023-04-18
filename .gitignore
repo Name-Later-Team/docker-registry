@@ -21,4 +21,8 @@ presentation-service/logs/*
 configs/*
 !configs/.gitkeep
 
+# rabbitmq
+rabbitmq/data/*
+!rabbitmq/.gitkeep
+
 .env

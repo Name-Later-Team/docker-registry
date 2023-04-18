@@ -119,7 +119,7 @@ services:
       - 15671:15671
       - 15672:15672
     volumes:
-      - ./data:/var/lib/rabbitmq/mnesia/
+      - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/
     networks:
       - local_network
 
@@ -172,6 +172,15 @@ services:
     restart: unless-stopped
     ports:
       - 6379:6379
+    networks:
+      - local_network
+
+  socket-redis:
+    image: redis:alpine
+    container_name: socket-redis
+    restart: unless-stopped
+    ports:
+      - 6378:6379
     networks:
       - local_network
 
