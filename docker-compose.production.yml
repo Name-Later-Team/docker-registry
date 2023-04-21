@@ -7,6 +7,10 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Ho_Chi_Minh
+      - VIRTUAL_HOST=""
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=""
+      - LETSENCRYPT_EMAIL=""
     env_file:
       - ./configs/.env.gateway
     volumes:
@@ -31,30 +35,34 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Ho_Chi_Minh
+      - VIRTUAL_HOST=""
+      - VIRTUAL_PORT=5001
+      - LETSENCRYPT_HOST=""
+      - LETSENCRYPT_EMAIL=""
     env_file:
       - ./configs/.env.socket
     volumes:
       - ./logs/socket-service:/app/logs
 
-  presenti:
-    image: sehcmusgroup1/presenti
-    container_name: presenti
-    restart: unless-stopped
-    environment:
-      - TZ=Asia/Ho_Chi_Minh
-    env_file:
-      - ./configs/.env.presenti
+  # presenti:
+  #   image: sehcmusgroup1/presenti
+  #   container_name: presenti
+  #   restart: unless-stopped
+  #   environment:
+  #     - TZ=Asia/Ho_Chi_Minh
+  #   env_file:
+  #     - ./configs/.env.presenti
 
-  presento:
-    image: sehcmusgroup1/presento
-    container_name: presento
-    restart: unless-stopped
-    environment:
-      - TZ=Asia/Ho_Chi_Minh
-    env_file:
-      - ./configs/.env.presento
-    volumes:
-      - ./logs/presento:/usr/src/presento/src/logs
+  # presento:
+  #   image: sehcmusgroup1/presento
+  #   container_name: presento
+  #   restart: unless-stopped
+  #   environment:
+  #     - TZ=Asia/Ho_Chi_Minh
+  #   env_file:
+  #     - ./configs/.env.presento
+  #   volumes:
+  #     - ./logs/presento:/usr/src/presento/src/logs
 
   casdoor:
     image: casbin/casdoor:v1.266.0
@@ -65,7 +73,11 @@ services:
       - mysql
       - redis
     environment:
-      RUNNING_IN_DOCKER: "true"
+      - RUNNING_IN_DOCKER=true
+      - VIRTUAL_HOST=""
+      - VIRTUAL_PORT=5001
+      - LETSENCRYPT_HOST=""
+      - LETSENCRYPT_EMAIL=""
     volumes:
       - ./casdoor/conf:/conf/
 
