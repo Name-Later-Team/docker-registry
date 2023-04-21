@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME=group1sechcmus/$1
+IMAGE_NAME=sehcmusgroup1/$1
 TAG=$2
 
 docker tag $IMAGE_NAME $IMAGE_NAME:$TAG

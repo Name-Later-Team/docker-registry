@@ -20,6 +20,7 @@ presentation-service/logs/*
 # configs
 configs/*
 !configs/.gitkeep
+!configs/*.env.*.template
 
 # rabbitmq
 rabbitmq/data/*

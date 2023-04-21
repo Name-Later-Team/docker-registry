@@ -1,95 +1,69 @@
-version: '3'
-
-networks:
-  local_network:
-    external: true
+version: "3"
 
 services:
   api-gateway:
-    image: 'group1sechcmus/api-gateway:${GATEWAY_VERSION}'
+    image: "sehcmusgroup1/api-gateway:${GATEWAY_VERSION}"
     container_name: api-gateway
-    build:
-      context: ../api-gateway
-      dockerfile: ../api-gateway/Dockerfile
     restart: unless-stopped
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
-      - ../api-gateway/.env.production
+      - ./configs/.env.gateway
     volumes:
       # mounting logs folder to local computer file system
-      - ./api-gateway/logs:/app/logs
+      - ./logs/api-gateway:/app/logs
     ports:
       - 9000:9000
-    networks:
-      - local_network
 
   presentation-service:
-    image: 'group1sechcmus/presentation-service:${PRESENTATION_VERSION}'
+    image: "sehcmusgroup1/presentation-service:${PRESENTATION_VERSION}"
     container_name: presentation-service
-    build:
-      context: ../presentation-service
-      dockerfile: ../presentation-service/Dockerfile
     restart: unless-stopped
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
-      - ../presentation-service/.env.production
+      - ./configs/.env.presentation
     volumes:
       # mounting logs folder to local computer file system
-      - ./presentation-service/logs:/app/logs
-    networks:
-      - local_network
+      - ./logs/presentation-service:/app/logs
 
   socket-service:
-    image: group1sechcmus/socket-service
+    image: "sehcmusgroup1/socket-service:${SOCKET_VERSION}"
     container_name: socket-service
-    build:
-      context: ../socket-service
-      dockerfile: ../socket-service/Dockerfile
     restart: unless-stopped
     ports:
-      - 3002:3000
+      - 5001:5001
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
-      - ../socket-service/.env.production
-    networks:
-      - local_network
+      - ./configs/.env.socket
+    volumes:
+      # mounting logs folder to local computer file system
+      - ./logs/socket-service:/app/logs
 
   presenti:
-    image: group1sechcmus/presenti
+    image: sehcmusgroup1/presenti
     container_name: presenti
-    build:
-      context: ../presenti
-      dockerfile: ../presenti/Dockerfile
     restart: unless-stopped
     ports:
-      - 3004:3000
+      - 3004:3004
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
-      - ../presenti/.env.production
-    networks:
-      - local_network
+      - ./configs/.env.presenti
 
   presento:
-    image: group1sechcmus/presento
+    image: sehcmusgroup1/presento
     container_name: presento
-    build:
-      context: ../presento
-      dockerfile: ../presento/Dockerfile
     restart: unless-stopped
     ports:
-      - 3005:3001
+      - 3001:3001
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:
-      - ../presento/backend/.env.production
+      - ./configs/.env.presento
     volumes:
-      - ./presento/logs:/usr/src/presento/src/logs
-    networks:
-      - local_network
+      - ./logs/presento:/usr/src/presento/src/logs
 
   casdoor:
     image: casbin/casdoor:v1.266.0
@@ -100,16 +74,15 @@ services:
       - 8000:8000
     depends_on:
       - mysql
+      - redis
     environment:
-      RUNNING_IN_DOCKER: 'true'
+      RUNNING_IN_DOCKER: "true"
     volumes:
       - ./casdoor/conf:/conf/
-    networks:
-      - local_network
 
-  rabbitmq:
+  rabbitmq-name-later:
     image: rabbitmq:3.10-alpine
-    container_name: rabbitmq
+    container_name: rabbitmq-name-later
     restart: unless-stopped
     environment:
       - RABBITMQ_DEFAULT_USER=rabbitmq
@@ -120,8 +93,6 @@ services:
       - 15672:15672
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/
-    networks:
-      - local_network
 
   postgres:
     image: postgres:14
@@ -135,8 +106,6 @@ services:
       - 5432:5432
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
-    networks:
-      - local_network
 
   mysql:
     restart: unless-stopped
@@ -149,22 +118,6 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
     volumes:
       - ./mysql:/var/lib/mysql
-    networks:
-      - local_network
-
-  mongo:
-    image: mongo:4.4.19-rc2
-    container_name: mongo
-    restart: unless-stopped
-    ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongo
-      - MONGO_INITDB_ROOT_PASSWORD=mongo
-    volumes:
-      - ./mongo/data:/data/db
-    networks:
-      - local_network
 
   redis:
     image: redis:alpine
@@ -172,8 +125,6 @@ services:
     restart: unless-stopped
     ports:
       - 6379:6379
-    networks:
-      - local_network
 
   socket-redis:
     image: redis:alpine
@@ -181,17 +132,10 @@ services:
     restart: unless-stopped
     ports:
       - 6378:6379
-    networks:
-      - local_network
 
-  ngrok:
-    image: ngrok/ngrok:alpine
-    container_name: ngrok
-    environment:
-      - NGROK_AUTHTOKEN=2MjmQ4H9yxaKEuwfFYGmHQDPfZV_5fuS8ZSzcSF1n5B7iKAWK
-    command: http host.docker.internal:3000 # for running on docker
-    # command: http 3000 # for running on local (from source)
+  presento-redis:
+    image: redis:alpine
+    container_name: socket-redis
+    restart: unless-stopped
     ports:
-      - 4040:4040
-    networks:
-      - local_network
+      - 6377:6379

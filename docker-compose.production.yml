@@ -1,0 +1,111 @@
+version: "3"
+
+services:
+  api-gateway:
+    image: "sehcmusgroup1/api-gateway:${GATEWAY_VERSION}"
+    container_name: api-gateway
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ./configs/.env.gateway
+    volumes:
+      # mounting logs folder to local computer file system
+      - ./logs/api-gateway:/app/logs
+
+  presentation-service:
+    image: "sehcmusgroup1/presentation-service:${PRESENTATION_VERSION}"
+    container_name: presentation-service
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ./configs/.env.presentation
+    volumes:
+      # mounting logs folder to local computer file system
+      - ./logs/presentation-service:/app/logs
+
+  socket-service:
+    image: "sehcmusgroup1/socket-service:${SOCKET_VERSION}"
+    container_name: socket-service
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ./configs/.env.socket
+    volumes:
+      - ./logs/socket-service:/app/logs
+
+  presenti:
+    image: sehcmusgroup1/presenti
+    container_name: presenti
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ./configs/.env.presenti
+
+  presento:
+    image: sehcmusgroup1/presento
+    container_name: presento
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - ./configs/.env.presento
+    volumes:
+      - ./logs/presento:/usr/src/presento/src/logs
+
+  casdoor:
+    image: casbin/casdoor:v1.266.0
+    container_name: casdoor
+    restart: unless-stopped
+    entrypoint: /bin/sh -c './server --createDatabase=true'
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      RUNNING_IN_DOCKER: "true"
+    volumes:
+      - ./casdoor/conf:/conf/
+
+  rabbitmq-name-later:
+    image: rabbitmq:3.10-alpine
+    container_name: rabbitmq-name-later
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    volumes:
+      - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+
+  mysql:
+    restart: unless-stopped
+    image: mysql:8.0.25
+    container_name: mysql
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+
+  socket-redis:
+    image: redis:alpine
+    container_name: socket-redis
+    restart: unless-stopped
