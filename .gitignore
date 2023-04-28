@@ -9,21 +9,23 @@ postgres/data/*
 postgres/.env
 !postgres/.gitkeep
 
-# api-gateway
-api-gateway/logs/*
-!api-gateway/logs/.gitkeep
+# configs env
+configs/env/*
+!configs/env/templates
 
-# presentation-service
-presentation-service/logs/*
-!presentation-service/logs/.gitkeep
-
-# configs
-configs/*
-!configs/.gitkeep
-!configs/*.env.*.template
+# configs keys
+configs/keys/*
+!configs/keys/.gitkeep
 
 # rabbitmq
 rabbitmq/data/*
 !rabbitmq/.gitkeep
 
 .env
+
+# log files
+logs/*/*
+!logs/*/.gitkeep
+
+# casdoor config
+casdoor/conf/app.conf
