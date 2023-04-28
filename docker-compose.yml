@@ -147,7 +147,7 @@ services:
 
   presento-redis:
     image: redis:alpine
-    container_name: socket-redis
+    container_name: presento-redis
     restart: unless-stopped
     ports:
       - 6377:6379
